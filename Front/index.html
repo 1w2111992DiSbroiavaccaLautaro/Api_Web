@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Alta de Alumno</title>
+</head>
+
+<body>
+
+    <form class="container">
+        <br><br><br>
+        <div class="form-row">
+
+            <div class="form-group col-md-6">
+                <label for="inputEmail4">Nombre</label>
+                <input type="text" class="form-control" id="txtNombre" placeholder="Nombre">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputPassword4">Apellido</label>
+                <input type="text" class="form-control" id="txtApellido" placeholder="Apellido">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputCity">Curso</label>
+                <input type="text" class="form-control" id="txtCurso" placeholder="Curso">
+            </div>
+            <div class="form-group col-md-6">
+                <label>Sexo</label>
+                <select id="txtSexo" name="sexo" class="form-control">
+                </select>
+            </div>
+
+        </div>
+        <div class="form-group">
+
+        </div>
+        <button type="button" id="btnAgregar" class="btn btn-primary">Ingresar</button>
+    </form>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: "https://localhost:5001/Alumnos/ObtenerSexo",
+                type: "GET",
+                success: function(result) {
+                    if (result.ok) {
+                        resultadoS = result.return;
+                        cargarCombo(resultadoS);
+                        console.log(resultadoS);
+                    } else {
+                        alert(result.error);
+                    }
+                },
+                error: function(error) {
+                    alert("Problemas con acceder a los sexos");
+                }
+
+            })
+        })
+
+        function cargarCombo(datos) {
+            var html = "<option value=''>Selecione</option>";
+            $("#txtSexo").append(html);
+            select = document.getElementById("txtSexo");
+            for (let i = 0; i < datos.length; i++) {
+                var option = document.createElement('option');
+                option.value = datos[i].sexoId;
+                option.text = datos[i].sexo1;
+                select.add(option);
+                console.log(datos[i].sexo1);
+            }
+            //console.log(select.value);
+        }
+
+        $("#btnAgregar").click(function() {
+            let nombre = $("#txtNombre").val();
+            let apellido = $("#txtApellido").val();
+            let curso = $("#txtCurso").val();
+            let sexo = $("#txtSexo").val();
+
+            if (nombre === "" || apellido === "" || curso === "" || sexo === "") {
+                swal.fire("Ingrese los datos del alumno");
+            } else {
+                agregarAlumno(nombre, apellido, curso, sexo);
+            }
+
+        })
+
+        function agregarAlumno(nombre, apellido, curso, sexo) {
+            comando = {
+                "nombre": nombre,
+                "apellido": apellido,
+                "curso": curso,
+                "sexoId": parseInt(sexo)
+            }
+
+
+            $.ajax({
+                url: "https://localhost:5001/Persona/AltaAlumno",
+                type: "POST",
+                dataType: 'JSON',
+                contentType: 'application/json',
+                data: JSON.stringify(comando),
+                success: function(result) {
+                    if (result.ok) {
+                        alert("ALta existosa");
+                    } else {
+                        alert(result.error);
+                    }
+                },
+                error: function(error) {
+                    alert("Problemas en el servidor");
+                }
+            })
+
+        }
+    </script>
+
+
+</body>
+
+</html>
